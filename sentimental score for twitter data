@@ -1,0 +1,43 @@
+#importing libraries
+import json
+from nltk.corpus import wordnet 
+from nltk.corpus import sentiwordnet as swn
+
+#Getting tweet score for the tweet
+def get_tweet_score(s):
+#splitting the word in the text
+    split_text = s.split()
+#finding sentiment score and overall score for each sentence
+    sentiment_score = 0
+    syn_denominator = 0
+    overall_score = 0
+#finding the synset for each word in the sentence
+    for w in split_text:
+         synset = wordnet.synsets(w)
+#if the word is having synset greater than 0 we are finding the name of the synset for that particular word in the sentence
+    if len(synset) > 0:
+                name = synset[0].name()
+#getting positive and negative score using sentiwordnet
+                breakdown = swn.senti_synset(name)
+                pos_score = breakdown.pos_score()
+                neg_score = breakdown.neg_score()
+                sentiment_score += neg_score - pos_score
+                syn_denominator += 1
+    if  syn_denominator !=0 :
+        overall_score = sentiment_score / syn_denominator
+        print(overall_score)
+#returning the overall score
+    return overall_score 
+#opening the file and read the lines in the file
+fp = open("tweets_savetheplanet_09-03-2020.txt", "r")
+lines = fp.readlines()
+#by parsing the lines
+for line in lines:
+    parsed_json = (json.loads(line))
+#we will get parsed text
+    if parsed_json['lang'] == 'en':
+        text = parsed_json['text']
+#getting the tweet score of the text
+        score = get_tweet_score(text)
+        print(text)
+        
