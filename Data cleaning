@@ -1,0 +1,31 @@
+!pip install emot
+import re
+import json
+from emot.emo_unicode import UNICODE_EMO, EMOTICONS
+def convert_emojis(text):
+    for emot in UNICODE_EMO:
+        text = text.replace(emot, "_".join(UNICODE_EMO[emot].replace(",","").replace(":","").split()))
+    return text
+
+def convert_emoticons(text):
+    for emot in EMOTICONS:
+        text = re.sub(u'('+emot+')', "_".join(EMOTICONS[emot].replace(",","").split()), text)
+    return text
+
+import nltk
+nltk.download('punkt')
+from nltk.corpus import stopwords
+nltk.download('stopwords')
+from nltk.tokenize import word_tokenize
+def cleaned_token(text):
+    text_tokens = word_tokenize(text)
+    tokens_without_sw = [word for word in text_tokens if not word in stopwords.words()]
+    return(tokens_without_sw)
+def cleaned_text(text):
+    emoticons_treated=convert_emojis(text)
+    emo_treated_lines=convert_emoticons(emoticons_treated)
+    clean_text=cleaned_token(emo_treated_lines)
+    return set(clean_text)
+    text = "I am very happy :). Have a nice day 👍. Also, I miss you :), take care😘! I can't leave."
+word_embedding = cleaned_text(text)
+print(word_embedding)
